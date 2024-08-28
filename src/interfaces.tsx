@@ -9,4 +9,5 @@ export interface Task {
   completed: boolean;
   important: boolean;
   id: string;
+  timer?: number; 
 }

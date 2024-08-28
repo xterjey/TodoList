@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Task } from "../../interfaces";
 import { useAppSelector } from "../../store/hooks";
 import Modal from "./Modal";
@@ -38,23 +38,44 @@ const ModalCreateTask: React.FC<{
   const day = today.getDate().toString().padStart(2, "0");
   const month = (today.getMonth() + 1).toString().padStart(2, "0");
   const year = today.getFullYear();
-  
+
   const todayDate = `${year}-${month}-${day}`;
   const maxDate = `${year + 1}-${month}-${day}`;
 
-  const [description, setDescription] = useState<string>(task?.link || "");
   const [title, setTitle] = useState<string>(task?.title || "");
   const [date, setDate] = useState<string>(task?.date || todayDate);
   const [link, setLink] = useState<string>(task?.link || "");
   const [link1, setLink1] = useState<string>(task?.link1 || "");
   const [link2, setLink2] = useState<string>(task?.link2 || "");
   const [link3, setLink3] = useState<string>(task?.link3 || "");
+  const [websiteTitle, setWebsiteTitle] = useState<string>("");
   const [isImportant, setIsImportant] = useState<boolean>(task?.important || false);
   const [isCompleted, setIsCompleted] = useState<boolean>(task?.completed || false);
   const [selectedDirectory, setSelectedDirectory] = useState<string>(task?.dir || directories[0]);
+  const [showExtraLinks, setShowExtraLinks] = useState<number>(0);
+  const [timer, setTimer] = useState<number>(task?.timer || 1); // Timer dalam jam
 
   const isTitleValid = useRef<boolean>(false);
   const isDateValid = useRef<boolean>(false);
+
+  useEffect(() => {
+    const getDomainName = (url: string) => {
+      try {
+        const hostname = new URL(url).hostname;
+        // Remove www. prefix if exists
+        const domain = hostname.replace(/^www\./, '');
+        // Replace dots with spaces
+        return domain.split('.').slice(0, -1).join(' ');
+      } catch (error) {
+        console.error("Error extracting domain name:", error);
+        return "Invalid URL";
+      }
+    };
+
+    if (link) {
+      setWebsiteTitle(getDomainName(link));
+    }
+  }, [link]);
 
   const addNewTaskHandler = (event: React.FormEvent): void => {
     event.preventDefault();
@@ -74,18 +95,24 @@ const ModalCreateTask: React.FC<{
         completed: isCompleted,
         important: isImportant,
         id: task?.id || Date.now().toString(),
+        timer: timer || undefined, // Menyertakan timer dalam jam
       };
       onConfirm(newTask);
       onClose();
     }
   };
 
+  const handleAddLink = () => {
+    if (showExtraLinks < 3) {
+      setShowExtraLinks((prev) => prev + 1);
+    }
+  };
+
+  const timerOptions = Array.from({ length: 24 }, (_, i) => i + 1);
+
   return (
     <Modal onClose={onClose} title={nameForm}>
-      <form
-        className="flex flex-col stylesInputsField"
-        onSubmit={addNewTaskHandler}
-      >
+      <form className="flex flex-col stylesInputsField" onSubmit={addNewTaskHandler}>
         <label>
           Title
           <input
@@ -119,35 +146,60 @@ const ModalCreateTask: React.FC<{
           />
         </label>
         <label>
-          Link 1 (optional)
+          Website Domain
           <input
             type="text"
-            placeholder="e.g., http://example.com"
-            value={link1}
-            onChange={({ target }) => setLink1(target.value)}
+            placeholder={websiteTitle || "Domain name"}
+            value={websiteTitle}
+            readOnly
             className="w-full"
           />
         </label>
-        <label>
-          Link 2 (optional)
-          <input
-            type="text"
-            placeholder="e.g., http://example.com"
-            value={link2}
-            onChange={({ target }) => setLink2(target.value)}
-            className="w-full"
-          />
-        </label>
-        <label>
-          Link 3 (optional)
-          <input
-            type="text"
-            placeholder="e.g., http://example.com"
-            value={link3}
-            onChange={({ target }) => setLink3(target.value)}
-            className="w-full"
-          />
-        </label>
+        {showExtraLinks >= 1 && (
+          <label>
+            Link 1 (optional)
+            <input
+              type="text"
+              placeholder="e.g., http://example.com"
+              value={link1}
+              onChange={({ target }) => setLink1(target.value)}
+              className="w-full"
+            />
+          </label>
+        )}
+        {showExtraLinks >= 2 && (
+          <label>
+            Link 2 (optional)
+            <input
+              type="text"
+              placeholder="e.g., http://example.com"
+              value={link2}
+              onChange={({ target }) => setLink2(target.value)}
+              className="w-full"
+            />
+          </label>
+        )}
+        {showExtraLinks >= 3 && (
+          <label>
+            Link 3 (optional)
+            <input
+              type="text"
+              placeholder="e.g., http://example.com"
+              value={link3}
+              onChange={({ target }) => setLink3(target.value)}
+              className="w-full"
+            />
+          </label>
+        )}
+        {showExtraLinks < 3 && (
+          <button
+            type="button"
+            className="btn mt-3"
+            onClick={handleAddLink}
+          >
+            Add Extra Link
+          </button>
+        )}
         <label>
           Select a directory
           <select
@@ -156,12 +208,22 @@ const ModalCreateTask: React.FC<{
             onChange={({ target }) => setSelectedDirectory(target.value)}
           >
             {directories.map((dir: string) => (
-              <option
-                key={dir}
-                value={dir}
-                className="bg-slate-100 dark:bg-slate-800"
-              >
+              <option key={dir} value={dir} className="bg-slate-100 dark:bg-slate-800">
                 {dir}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Timer (in hours)
+          <select
+            className="block w-full"
+            value={timer}
+            onChange={({ target }) => setTimer(parseInt(target.value) || 1)} // Menyertakan timer dalam jam
+          >
+            {timerOptions.map(i => (
+              <option key={i} value={i}>
+                {i} hour{ i > 1 ? 's' : '' }
               </option>
             ))}
           </select>

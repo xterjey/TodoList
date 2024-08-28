@@ -25,7 +25,7 @@ const App: React.FC = () => {
   };
 
   const handlePinSubmit = (pin: string) => {
-    if (pin === "1610") { // Ganti dengan PIN yang sesuai
+    if (pin === "1610") { 
       setPinEntered(true);
     } else {
       alert("Incorrect PIN");
