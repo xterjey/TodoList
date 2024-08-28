@@ -6,6 +6,7 @@ import LayoutMenus from "../Utilities/LayoutMenus";
 import DarkMode from "./DarkMode";
 import DeleteTasks from "./DeleteTasks";
 import TasksDone from "./TasksDone";
+import Notepad from "./Notepad"; // Import komponen Notepad
 
 const AccountData: React.FC = () => {
   const menuOpen = useAppSelector((state) => state.menu.menuAccountOpened);
@@ -29,9 +30,12 @@ const AccountData: React.FC = () => {
         </span>
 
         <DarkMode />
-
         <TasksDone />
+        
+        {/* Tambahkan komponen Notepad */}
+        <Notepad />
         <DeleteTasks />
+
         <a
           href="https://github.com/xterjey"
           className="mt-4 bg-rose-100 p-2 rounded-md text-rose-600 text-center transition hover:bg-rose-200 dark:bg-slate-700/[.3] dark:text-slate-200"
