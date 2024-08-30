@@ -74,24 +74,36 @@ const InfosTask: React.FC<InfosTaskProps> = ({ task, isListInView1, onTimerEnd }
             <Calendar className="mr-2 w-4 sm:w-5" /> {dateFormatted}
           </time>
         )}
-        <span className="flex items-center font-medium dark:text-slate-200">
+      <span className="flex items-center font-medium text-slate-800 dark:text-slate-200">
           <span className="mr-2">{task.title}</span>
-          {task.link && (
+          {task.url && (
             <img
-              src={getFaviconUrl(task.link)}
+              src={getFaviconUrl(task.url)}
               alt="favicon"
               className="h-6 w-6"
             />
           )}
         </span>
       </div>
-      {[task.link, task.link1, task.link2, task.link3].map((link, index) =>
+      {task.url && (
+        <a
+          href={task.url}
+          title={getDomainName(task.url)}
+          className={`block mb-2 text-slate-800 dark:text-slate-200 flex items-center ${isListInView1 ? "line-clamp-2 sm:line-clamp-1" : "line-clamp-3"}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={getDomainName(task.url)}
+        >
+          {getDomainName(task.url)}
+        </a>
+      )}
+      {[task.discord,task.blockchain ,task.twitter, task.telegram].map((link, index) =>
         link ? (
           <a
             key={index}
             href={link}
             title={getDomainName(link)}
-            className={`block mb-2 text-slate-500 dark:text-slate-500 flex items-center ${isListInView1 ? "line-clamp-2 sm:line-clamp-1" : "line-clamp-3"}`}
+            className={`block mb-2 text-slate-800 dark:text-slate-200 flex items-center ${isListInView1 ? "line-clamp-2 sm:line-clamp-1" : "line-clamp-3"}`}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={getDomainName(link)}
@@ -99,10 +111,19 @@ const InfosTask: React.FC<InfosTaskProps> = ({ task, isListInView1, onTimerEnd }
             {getDomainName(link)}
           </a>
         ) : null
+        
       )}
-      {task.timer && (
+      
+
+      {task.wallet && (
         <div className="mt-2 flex items-center">
-          <span className="text-slate-500 dark:text-slate-400">Timer:</span>
+<span className="text-slate-800 dark:text-slate-200">Wallet:</span>
+          <span className="ml-2">{task.wallet}</span>
+        </div>
+      )}
+        {task.timer && (
+        <div className="mt-2 flex items-center">
+ <span className="text-slate-800 dark:text-slate-200">Timer:</span>
           <span className="ml-2">{formatTime(remainingTime)}</span>
         </div>
       )}

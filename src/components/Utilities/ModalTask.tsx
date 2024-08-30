@@ -44,38 +44,19 @@ const ModalCreateTask: React.FC<{
 
   const [title, setTitle] = useState<string>(task?.title || "");
   const [date, setDate] = useState<string>(task?.date || todayDate);
-  const [link, setLink] = useState<string>(task?.link || "");
-  const [link1, setLink1] = useState<string>(task?.link1 || "");
-  const [link2, setLink2] = useState<string>(task?.link2 || "");
-  const [link3, setLink3] = useState<string>(task?.link3 || "");
-  const [websiteTitle, setWebsiteTitle] = useState<string>("");
+  const [url, setUrl] = useState<string>(task?.url || "");
+  const [discord, setDiscord] = useState<string>(task?.discord || "");
+  const [twitter, setTwitter] = useState<string>(task?.twitter || "");
+  const [telegram, setTelegram] = useState<string>(task?.telegram || "");
+  const [blockchain, setBlockchain] = useState<string>(task?.blockchain || "");
+  const [wallet, setWallet] = useState<string>(task?.wallet || "");
   const [isImportant, setIsImportant] = useState<boolean>(task?.important || false);
   const [isCompleted, setIsCompleted] = useState<boolean>(task?.completed || false);
   const [selectedDirectory, setSelectedDirectory] = useState<string>(task?.dir || directories[0]);
-  const [showExtraLinks, setShowExtraLinks] = useState<number>(0);
-  const [timer, setTimer] = useState<number>(task?.timer || 1); // Timer dalam jam
+  const [timer, setTimer] = useState<number>(task?.timer || 1); // Timer in hours
 
   const isTitleValid = useRef<boolean>(false);
   const isDateValid = useRef<boolean>(false);
-
-  useEffect(() => {
-    const getDomainName = (url: string) => {
-      try {
-        const hostname = new URL(url).hostname;
-        // Remove www. prefix if exists
-        const domain = hostname.replace(/^www\./, '');
-        // Replace dots with spaces
-        return domain.split('.').slice(0, -1).join(' ');
-      } catch (error) {
-        console.error("Error extracting domain name:", error);
-        return "Invalid URL";
-      }
-    };
-
-    if (link) {
-      setWebsiteTitle(getDomainName(link));
-    }
-  }, [link]);
 
   const addNewTaskHandler = (event: React.FormEvent): void => {
     event.preventDefault();
@@ -87,28 +68,40 @@ const ModalCreateTask: React.FC<{
       const newTask: Task = {
         title,
         dir: selectedDirectory,
-        link,
-        link1,
-        link2,
-        link3,
+        url,
         date: date || undefined,
         completed: isCompleted,
         important: isImportant,
         id: task?.id || Date.now().toString(),
-        timer: timer || undefined, // Menyertakan timer dalam jam
+        timer: timer || undefined,
+        discord: discord || undefined,
+        twitter: twitter || undefined,
+        telegram: telegram || undefined,
+        blockchain: blockchain || undefined,
+        wallet: wallet || undefined,
       };
       onConfirm(newTask);
       onClose();
     }
   };
 
-  const handleAddLink = () => {
-    if (showExtraLinks < 3) {
-      setShowExtraLinks((prev) => prev + 1);
-    }
-  };
-
   const timerOptions = Array.from({ length: 24 }, (_, i) => i + 1);
+  const walletOptions = [
+    "MetaMask",
+    "Trust Wallet",
+    "OKX",
+    "ArConnect",
+    "Fact Wallet",
+    "Keplr",
+    "Kibisis",
+    "Leap Cosmos",
+    "Leather",
+    "Leo Wallet",
+    "Salmon",
+    "Unisat",
+    "Venom",
+    "Zerion",
+  ];
 
   return (
     <Modal onClose={onClose} title={nameForm}>
@@ -136,70 +129,69 @@ const ModalCreateTask: React.FC<{
           />
         </label>
         <label>
-          Link
+          URL
           <input
             type="text"
             placeholder="e.g., http://example.com"
-            value={link}
-            onChange={({ target }) => setLink(target.value)}
+            value={url}
+            onChange={({ target }) => setUrl(target.value)}
             className="w-full"
           />
         </label>
         <label>
-          Website Domain
+          Discord (optional)
           <input
             type="text"
-            placeholder={websiteTitle || "Domain name"}
-            value={websiteTitle}
-            readOnly
+            placeholder="e.g., https://discord.com/..."
+            value={discord}
+            onChange={({ target }) => setDiscord(target.value)}
             className="w-full"
           />
         </label>
-        {showExtraLinks >= 1 && (
-          <label>
-            Link 1 (optional)
-            <input
-              type="text"
-              placeholder="e.g., http://example.com"
-              value={link1}
-              onChange={({ target }) => setLink1(target.value)}
-              className="w-full"
-            />
-          </label>
-        )}
-        {showExtraLinks >= 2 && (
-          <label>
-            Link 2 (optional)
-            <input
-              type="text"
-              placeholder="e.g., http://example.com"
-              value={link2}
-              onChange={({ target }) => setLink2(target.value)}
-              className="w-full"
-            />
-          </label>
-        )}
-        {showExtraLinks >= 3 && (
-          <label>
-            Link 3 (optional)
-            <input
-              type="text"
-              placeholder="e.g., http://example.com"
-              value={link3}
-              onChange={({ target }) => setLink3(target.value)}
-              className="w-full"
-            />
-          </label>
-        )}
-        {showExtraLinks < 3 && (
-          <button
-            type="button"
-            className="btn mt-3"
-            onClick={handleAddLink}
+        <label>
+          Twitter (optional)
+          <input
+            type="text"
+            placeholder="e.g., https://twitter.com/..."
+            value={twitter}
+            onChange={({ target }) => setTwitter(target.value)}
+            className="w-full"
+          />
+        </label>
+        <label>
+          Telegram (optional)
+          <input
+            type="text"
+            placeholder="e.g., https://t.me/..."
+            value={telegram}
+            onChange={({ target }) => setTelegram(target.value)}
+            className="w-full"
+          />
+        </label>
+        <label>
+          Blockchain (optional)
+          <input
+            type="text"
+            placeholder="e.g., Ethereum"
+            value={blockchain}
+            onChange={({ target }) => setBlockchain(target.value)}
+            className="w-full"
+          />
+        </label>
+        <label>
+          Wallet
+          <select
+            className="block w-full"
+            value={wallet}
+            onChange={({ target }) => setWallet(target.value)}
           >
-            Add Extra Link
-          </button>
-        )}
+            {walletOptions.map((wallet) => (
+              <option key={wallet} value={wallet} className="bg-slate-100 dark:bg-slate-800">
+                {wallet}
+              </option>
+            ))}
+          </select>
+        </label>
         <label>
           Select a directory
           <select
@@ -219,7 +211,7 @@ const ModalCreateTask: React.FC<{
           <select
             className="block w-full"
             value={timer}
-            onChange={({ target }) => setTimer(parseInt(target.value) || 1)} // Menyertakan timer dalam jam
+            onChange={({ target }) => setTimer(parseInt(target.value) || 1)}
           >
             {timerOptions.map(i => (
               <option key={i} value={i}>
