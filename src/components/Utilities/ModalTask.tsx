@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Task } from "../../interfaces";
 import { useAppSelector } from "../../store/hooks";
 import Modal from "./Modal";
@@ -53,7 +53,6 @@ const ModalCreateTask: React.FC<{
   const [isImportant, setIsImportant] = useState<boolean>(task?.important || false);
   const [isCompleted, setIsCompleted] = useState<boolean>(task?.completed || false);
   const [selectedDirectory, setSelectedDirectory] = useState<string>(task?.dir || directories[0]);
-  const [timer, setTimer] = useState<number>(task?.timer || 1); // Timer in hours
 
   const isTitleValid = useRef<boolean>(false);
   const isDateValid = useRef<boolean>(false);
@@ -73,7 +72,6 @@ const ModalCreateTask: React.FC<{
         completed: isCompleted,
         important: isImportant,
         id: task?.id || Date.now().toString(),
-        timer: timer || undefined,
         discord: discord || undefined,
         twitter: twitter || undefined,
         telegram: telegram || undefined,
@@ -85,7 +83,6 @@ const ModalCreateTask: React.FC<{
     }
   };
 
-  const timerOptions = Array.from({ length: 24 }, (_, i) => i + 1);
   const walletOptions = [
     "MetaMask",
     "Trust Wallet",
@@ -110,7 +107,7 @@ const ModalCreateTask: React.FC<{
           Title
           <input
             type="text"
-            placeholder="e.g., study for the test"
+            placeholder="NAMA PROJECT"
             required
             value={title}
             onChange={({ target }) => setTitle(target.value)}
@@ -118,7 +115,7 @@ const ModalCreateTask: React.FC<{
           />
         </label>
         <label>
-          Date (optional)
+          Date
           <input
             type="date"
             className="w-full"
@@ -132,47 +129,47 @@ const ModalCreateTask: React.FC<{
           URL
           <input
             type="text"
-            placeholder="e.g., http://example.com"
+            placeholder="URL"
             value={url}
             onChange={({ target }) => setUrl(target.value)}
             className="w-full"
           />
         </label>
         <label>
-          Discord (optional)
+         TELEGRAM / DISCROD
           <input
             type="text"
-            placeholder="e.g., https://discord.com/..."
+            placeholder="LINK"
             value={discord}
             onChange={({ target }) => setDiscord(target.value)}
             className="w-full"
           />
         </label>
         <label>
-          Twitter (optional)
+          BLOCKCHAIN
           <input
             type="text"
-            placeholder="e.g., https://twitter.com/..."
+            placeholder="LINK"
             value={twitter}
             onChange={({ target }) => setTwitter(target.value)}
             className="w-full"
           />
         </label>
         <label>
-          Telegram (optional)
+         EVENT 
           <input
             type="text"
-            placeholder="e.g., https://t.me/..."
+            placeholder="LINK"
             value={telegram}
             onChange={({ target }) => setTelegram(target.value)}
             className="w-full"
           />
         </label>
         <label>
-          Blockchain (optional)
+        EVENT 2
           <input
             type="text"
-            placeholder="e.g., Ethereum"
+            placeholder="LINK"
             value={blockchain}
             onChange={({ target }) => setBlockchain(target.value)}
             className="w-full"
@@ -206,25 +203,6 @@ const ModalCreateTask: React.FC<{
             ))}
           </select>
         </label>
-        <label>
-          Timer (in hours)
-          <select
-            className="block w-full"
-            value={timer}
-            onChange={({ target }) => setTimer(parseInt(target.value) || 1)}
-          >
-            {timerOptions.map(i => (
-              <option key={i} value={i}>
-                {i} hour{ i > 1 ? 's' : '' }
-              </option>
-            ))}
-          </select>
-        </label>
-        <InputCheckbox
-          isChecked={isImportant}
-          setChecked={setIsImportant}
-          label="Mark as important"
-        />
         <InputCheckbox
           isChecked={isCompleted}
           setChecked={setIsCompleted}

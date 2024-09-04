@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Task } from "../../../interfaces";
 import { ReactComponent as Calendar } from "../../../assets/date.svg";
 import useDate from "../../hooks/useDate";
@@ -14,13 +14,6 @@ const getDomainName = (url: string) => {
   }
 };
 
-const formatTime = (totalSeconds: number) => {
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-};
-
 const getFaviconUrl = (url: string) => {
   try {
     const domain = new URL(url).hostname;
@@ -34,36 +27,10 @@ const getFaviconUrl = (url: string) => {
 interface InfosTaskProps {
   task: Task;
   isListInView1: boolean;
-  onTimerEnd?: (taskId: string) => void; // New prop
 }
 
-const InfosTask: React.FC<InfosTaskProps> = ({ task, isListInView1, onTimerEnd }) => {
-  const [remainingTime, setRemainingTime] = useState<number>(0);
+const InfosTask: React.FC<InfosTaskProps> = ({ task, isListInView1 }) => {
   const dateFormatted = useDate(task.date || "");
-
-  useEffect(() => {
-    const key = `endTime_${task.title}`;
-    const savedEndTime = localStorage.getItem(key);
-    const endTime = savedEndTime ? parseInt(savedEndTime, 10) : Date.now() + (task.timer ?? 0) * 3600000;
-
-    if (task.timer) {
-      localStorage.setItem(key, endTime.toString());
-      const updateTimer = () => {
-        const now = Date.now();
-        const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
-        setRemainingTime(timeLeft);
-
-        if (timeLeft <= 0) {
-          localStorage.removeItem(key);
-          if (onTimerEnd) onTimerEnd(task.id); // Call onTimerEnd with taskId
-        }
-      };
-
-      updateTimer();
-      const intervalId = setInterval(updateTimer, 1000);
-      return () => clearInterval(intervalId);
-    }
-  }, [task.timer, task.title, onTimerEnd]);
 
   return (
     <div className={`flex flex-col ${isListInView1 ? "mr-6" : ""}`}>
@@ -74,7 +41,7 @@ const InfosTask: React.FC<InfosTaskProps> = ({ task, isListInView1, onTimerEnd }
             <Calendar className="mr-2 w-4 sm:w-5" /> {dateFormatted}
           </time>
         )}
-      <span className="flex items-center font-medium text-slate-800 dark:text-slate-200">
+        <span className="flex items-center font-medium text-slate-800 dark:text-slate-200">
           <span className="mr-2">{task.title}</span>
           {task.url && (
             <img
@@ -97,7 +64,7 @@ const InfosTask: React.FC<InfosTaskProps> = ({ task, isListInView1, onTimerEnd }
           {getDomainName(task.url)}
         </a>
       )}
-      {[task.discord,task.blockchain ,task.twitter, task.telegram].map((link, index) =>
+      {[task.discord, task.blockchain, task.twitter, task.telegram].map((link, index) =>
         link ? (
           <a
             key={index}
@@ -111,20 +78,12 @@ const InfosTask: React.FC<InfosTaskProps> = ({ task, isListInView1, onTimerEnd }
             {getDomainName(link)}
           </a>
         ) : null
-        
       )}
-      
 
       {task.wallet && (
         <div className="mt-2 flex items-center">
-<span className="text-slate-800 dark:text-slate-200">Wallet:</span>
+          <span className="text-slate-800 dark:text-slate-200">Wallet:</span>
           <span className="ml-2">{task.wallet}</span>
-        </div>
-      )}
-        {task.timer && (
-        <div className="mt-2 flex items-center">
- <span className="text-slate-800 dark:text-slate-200">Timer:</span>
-          <span className="ml-2">{formatTime(remainingTime)}</span>
         </div>
       )}
     </div>
