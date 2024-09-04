@@ -3,16 +3,8 @@ import { NavLink, useLocation } from "react-router-dom";
 
 const links = [
   {
-    name: "All",
+    name: "TASK",
     path: "/",
-  },
-  {
-    name: "News",
-    path: "/today",
-  },
-  {
-    name: "important",
-    path: "/important",
   },
   {
     name: "Completed tasks",
